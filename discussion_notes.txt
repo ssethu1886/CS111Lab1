@@ -1,0 +1,107 @@
+﻿Implement pipe
+,/pipe ls cat more
+ls | cat | more 
+
+
+Two pieces
+* Spawning process
+   * Fork
+      * System call for parent to fork itself into exact same two process
+      * Child is copy, but differed process id
+   * Execve 
+* Piping input/ouput
+
+
+Forking
+* How to distinguish between parent and child
+* Child- return value is always 0
+* Parent- returns process id 
+* Negative- fork failed
+* Order of printing is non deterministic- just depends on how CPU schedules two processes 
+* Unistd is for fork
+* https://man7.org/linux/man-pages/man2/fork.2.html 
+* Errno- set to indicate error
+* If fork fails, just return value of errno
+
+
+Exec
+* Int execve (pathname, arguments, environmental variables)
+* Does not really return- nothing to return to
+* Replaces existing process, not spawning a new 
+* Fork and then replace child with execve
+   * Replaces child with new code
+* Use execlp
+
+
+Redirection 
+* When shell runs program, opens 3 files with file descriptors 0, 1, 2
+   * Std in, std out, std err
+* By default connected to terminal
+* Connect std out of LHS to std input to RHS
+
+
+File descriptors
+* In Linux everything is a file
+* File system- interface between app and lower level device managers
+
+
+Int fd=open(“.txt”)
+* Open is a system call
+* Returns file descriptor which points to .txt
+
+
+Int ret = read(fd, &input, count);
+* Reads specified number of bytes 
+
+
+* File descriptors are really a table
+
+
+Redirection
+* Often don’t want std file descriptors to point to default locations
+* Want to point to an in memory buffer provided by kernel 
+* RHS use same buffer and take it as stdin
+* Pipe is an in memory buffer that connects two processes
+
+
+
+
+
+
+3 sub components
+* Read and execute programs represent by arguments
+* Execution ordering align with arguments
+* Create a pipe between 2 adjacent 
+
+
+Pipe
+* Pipe is for one way communication
+* Can be used by creating parent process 
+* File descriptors are shared by child process made with fork
+
+
+Pipes and child processes
+* Fork then pipes
+   * Child will have same file descriptor table
+* Pipes then fork
+   * What we should do
+   * Want child process to be able to access so can access pipes 
+   * Child process will inherit file descriptors 
+
+
+Make fd1 writing end of pipe
+* Dup 
+* Dup2 (old file descriptor, new file descriptor)
+* Have second argument also point to first 
+* Duplicate old fd, make new fd point to same file descriptor as oldfd 
+* Int fd = open(“my_new_file.txt”, )
+* Dup2 (fd, STDOUT_FILENO)
+   * STDOUT points to new file
+
+
+Make process that takes input from file called abc.txt instead of keyboard
+
+
+Starting
+* ./pipe ls cat wc  - 4 args
+*
